@@ -1,0 +1,52 @@
+#!/bin/bash
+function install {
+  # Install git
+  sudo apt-get install git-core git-gui git-doc
+}
+
+function configure {
+  # Setup git
+  echo "Setting up git:"
+
+  # Get user details
+  read -p "Enter your email, followed by [ENTER]:" email
+  read -p "Enter your fullname, followed by [ENTER]:" name
+
+  # Generate ssh key
+  ssh-keygen -t rsa -C "$email"
+
+  # Allow user time to add key to github
+  read -p "Please add your key to github and press any key to continue..."
+
+  # Associate the generated key with the supplied email and name
+  git config --global user.name "$name"
+  git config --global user.email "$email"
+
+  # Uncomment to allow tools that do not use ssh
+  #read -p "Enter github username, followed by [ENTER]:" username
+  #read -p "Enter github token, followed by [ENTER]:" token
+  #git config --global github.user "$username"
+  #git config --global github.token "$token"
+
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage git clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi
+

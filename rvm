@@ -1,0 +1,79 @@
+#!/bin/bash
+
+function install {
+
+  # Install build requirements
+  sudo apt-get install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion wget
+
+  # Get the path dir containing the script
+  SOURCE="${BASH_SOURCE[0]}"
+  while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+  # Install rvm
+  echo "Installing rvm:"
+  bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer )
+  #echo '[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Load RVM function' >> ~/.bashrc
+	# Copy database.yml template to project
+	cp $DIR/sources/bashrc ~/.bashrc
+  source ~/.bashrc
+  
+  echo "install complete, please resart your session to continue..."
+  
+}
+
+function configure {
+
+  # IMPORTANT: Source RVM as a function into local environment.
+  #            Otherwise switching gemsets won't work.
+  [ -s "$HOME/.rvm/scripts/rvm" ] && . "$HOME/.rvm/scripts/rvm"
+
+  # Install ruby
+  echo "Installing ruby:"
+  rvm install 1.9.3
+
+  # Configure rvm ruby environment
+  echo "Setting up ruby environment:"
+  rvm use 1.9.3 --default
+  rvm gemset create accomademic
+  rvm 1.9.3@accomademic
+  
+  # Install bundler
+  gem install bundler
+  
+}
+
+function clean {
+
+  # Get project dir
+  read -p "Please enter your projects directory, followed by [ENTER]:" PDIR
+
+  echo "Returning the sytem to a clean state:"
+  # Drop the database
+  cd $PDIR && rake drop
+  # Remove rvm
+  rvm implode
+  # Remove project
+  rm -rf $PDIR
+  
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage rvm clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi

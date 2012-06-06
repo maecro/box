@@ -1,0 +1,53 @@
+#!/bin/bash
+function install {
+
+  sudo add-apt-repository ppa:ubuntu-on-rails/ppa
+  sudo apt-get update
+
+  # Install virtual box guest additions
+  #sudo apt-get install virtualbox-ose-guest-utils
+
+  # Install rmagick deps
+  sudo apt-get install imagemagick libmagickcore-dev libmagickwand-dev
+
+  # Install nodejs for assets pipeline
+  sudo apt-get install nodejs
+
+  # Install solr
+  sudo apt-get install solr-jetty
+
+  # Install requirements for capybara-webkit
+  sudo apt-get install libqt4-dev libqtwebkit-dev gtk2-engines-pixbuf
+
+  # Add textmate like functionality to gedit
+  sudo apt-get install gedit-gmate gedit-plugins
+
+}
+
+function configure {
+  echo "Nothing to configure."
+}
+
+function clean {
+  echo "Nothing to clean."
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage dependancies clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi

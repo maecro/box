@@ -1,0 +1,29 @@
+#!/bin/bash
+function install {
+  # Install mysql
+  echo "Installing mysql server:"
+  sudo apt-get install mysql-server libmysqlclient15-dev
+  sudo /etc/init.d/mysql restart
+  echo "Validating install:"
+  sudo netstat -tap | grep mysql
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage mysql clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi

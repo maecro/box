@@ -1,0 +1,48 @@
+#!/bin/bash
+function install {
+
+  # Install postgres
+  echo "Installing postgres server:"
+  sudo apt-get install postgresql postgresql-server-dev-all
+  
+  echo "Please type \password postgres to set the root password and press Ctrl+D to exit."
+  sudo -u postgres psql postgres
+  
+  # Trust is the simplest permission for an insecure system
+  #echo "Please edit permissions in /etc/postgresql/8.4/main/pg_hba.conf and reload postgres with /etc/init.d/postgresql reload"
+  
+  # Create a database user; should be the same as your account
+  read -p "Please enter your database username, followed by [ENTER]:" DBUSER
+  
+  echo "Creating postgres user $dbuser:"
+  sudo -u postgres -H bash -c "createuser $DBUSER && exit"
+  
+}
+
+function configure {
+  echo "Nothing to configure."
+}
+
+function clean {
+  echo "Nothing to clean."
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage postgres clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi

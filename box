@@ -1,0 +1,45 @@
+#!/bin/bash
+
+function install {
+
+  # Perform the install
+  bash dependancies install
+  bash postgres install
+  bash git install
+  bash rbenv install
+  
+}
+
+function configure {
+
+  echo "Executing configuration options:"
+  bash rvm configure
+  bash project configure
+  
+}
+
+function clean {
+
+  bash project clean
+  
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage box clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi

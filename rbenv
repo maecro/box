@@ -1,0 +1,65 @@
+#!/bin/bash
+
+function install {
+
+  # Install build requirements
+  sudo apt-get install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion wget
+
+  # Install rbenv
+  git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
+  echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+  echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+
+  mkdir -p ~/.rbenv/plugins
+  cd ~/.rbenv/plugins && git clone git://github.com/sstephenson/ruby-build.git
+  # Install ruby-build:
+  #pushd /tmp
+  #  git clone git://github.com/sstephenson/ruby-build.git
+  #  cd ruby-build
+  #  sudo ./install.sh
+  #popd
+  source ~/.bashrc
+
+  echo "install complete, please resart your session to continue..."
+  
+}
+
+function configure {
+
+  echo "Configuring rbenv."
+  rbenv install ~/.rbenv/plugins/ruby-build/share/ruby-build/1.9.3-p125
+  rbenv global 1.9.3-p125
+  gem install bundler
+  rbenv rehash
+
+}
+
+function clean {
+  
+  echo "Cleaning system..."
+  rm -rf ~/.rbenv
+  echo "Please remove entries from your .bashrc file."
+  #sed -i '/export PATH="$HOME/.rbenv/bin:$PATH"/d' ~/.bashrc
+  #sed -i '/eval "$(rbenv init -)"/d' ~/.bashrc
+
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage rbenv clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi

@@ -1,0 +1,78 @@
+#!/bin/bash
+
+function install {
+  echo "Nothing to install."
+}
+
+
+function configure {
+
+  # Get the path dir containing the script
+  SOURCE="${BASH_SOURCE[0]}"
+  while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  
+  # Get database details
+  read -p "Please enter your database username, followed by [ENTER]:" DBUSER
+  read -p "Please enter your database name, followed by [ENTER]:" DBNAME
+	
+  DDB=$DBNAME"_development"
+  TDB=$DBNAME"_test"
+  PDB=$DBNAME"_production"
+
+  # Get project dir
+  read -p "Please enter your projects directory, followed by [ENTER]:" PDIR
+	
+  # Copy database.yml template to project
+  cp $DIR/sources/database.yml $PDIR/config/database.yml
+  
+  # Update copied database.yml
+  sed -i "s/development_user/$DBUSER/g" $PDIR/config/database.yml
+  sed -i "s/test_user/$DBUSER/g" $PDIR/config/database.yml
+  sed -i "s/production_user/$DBUSER/g" $PDIR/config/database.yml
+	
+  sed -i "s/development_db/$DDB/g" $PDIR/config/database.yml
+  sed -i "s/test_db/$TDB/g" $PDIR/config/database.yml
+  sed -i "s/production_db/$PDB/g" $PDIR/config/database.yml
+  
+  # Install gems
+  cd $PDIR && bundle install
+	
+  # Rebuild database
+  cd $PDIR && rake db:create && rake db:schema:load && rake db:seed && rake db:test:prepare
+  
+}
+
+function clean {
+
+  # Get project dir
+  read -p "Please enter your projects directory, followed by [ENTER]:" PDIR
+
+  echo "Returning the sytem to a clean state:"
+  # Drop the database
+  cd $PDIR && rake drop
+
+  # Remove project
+  rm -rf $PDIR
+  
+}
+
+if [ "$1" != "clean"  ] || [ "$1" != "configure" ] || [ "$1" != "install" ]
+then
+echo "Usage rails clean || configure || install"
+fi
+
+if [ "$1" = "clean" ]
+then
+clean
+fi
+
+if [ "$1" = "configure" ]
+then
+configure
+fi
+
+if [ "$1" = "install" ]
+then
+install
+fi
